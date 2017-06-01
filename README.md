@@ -1,6 +1,8 @@
 # monitoring-tools
 Kamila's monitoring toolkit. Revolves around [Prometheus](https://prometheus.io/).
 
+*Note*: All of this is a WIP and not everything I mention here is already online. I will be publishing a lot of stuff in the upcoming weeks.
+
 ## `cdist` types for easy installation
 
 [cdist](http://www.nico.schottelius.org/software/cdist/) is an interesting take on configuration management. I have created several types that aid in installing a Prometheus monitoring server and exporters:
@@ -12,18 +14,19 @@ Kamila's monitoring toolkit. Revolves around [Prometheus](https://prometheus.io/
 - `__prometheus_alertmanager`: install and configure Prometheus Alertmanager
 - `__grafana_dashboard`: install and configure [Grafana](https://grafana.com/)
 
-### Example (WIP, parameters may change, have bugs, or not exist yet):
+### Example:
 
 Server:
 ```sh
 PROMPORT=9090
 ALERTPORT=9093
 
-__daemontools
+__daemontools --from-package daemontools
+__golang_from_vendor --version 1.8.1  # required for prometheus and many exporters
 
 ##### Prometheus server: scrapes and evaluates data #########################
 
-__prometheus_server \
+require="__golang_from_vendor" __prometheus_server \
 	--config "$__type/files/prometheus.yml" \
 	--retention-days 14 \
 	--storage-path /data/prometheus \
@@ -36,7 +39,7 @@ __consul_service prometheus --port $PROMPORT --check-http "http://localhost:$POR
 
 ##### Alertmanager: routes alerts ###########################################
 
-__prometheus_alertmanager \
+require="__golang_from_vendor" __prometheus_alertmanager \
 	--config "$__type/files/alertmanager.yml" \
 	--storage-path /data/prometheus \
 	--listen-address "[::]:$PROMPORT" \
@@ -48,6 +51,9 @@ __consul_service alertmanager --port $ALERTPORT --check-http "http://localhost:$
 Node:
 ```sh
 PORT=9100
+
+__daemontools --from-package daemontools
+__golang_from_vendor --version 1.8.1  # required for prometheus and many exporters
 
 export GOBIN=/opt/gocode/bin  # where to find go binaries
 
