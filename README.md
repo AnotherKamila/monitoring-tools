@@ -19,6 +19,8 @@ Server:
 PROMPORT=9090
 ALERTPORT=9093
 
+__daemontools
+
 ##### Prometheus server: scrapes and evaluates data #########################
 
 __prometheus_server \
@@ -27,7 +29,8 @@ __prometheus_server \
 	--storage-path /data/prometheus \
 	--listen-address "[::]:$PROMPORT" \
 	--rule-files "$__type/files/*.rules" \
-	--alertmanager-url "http://monitoring1.node.consul:$ALERTPORT,http://monitoring2.node.consul:$ALERTPORT"
+	--alertmanager-url "http://monitoring1.node.consul:$ALERTPORT,http://monitoring2.node.consul:$ALERTPORT" \
+	--add-daemontools-service
 
 __consul_service prometheus --port $PROMPORT --check-http "http://localhost:$PORT/metrics" --check-interval 10s
 
@@ -36,7 +39,8 @@ __consul_service prometheus --port $PROMPORT --check-http "http://localhost:$POR
 __prometheus_alertmanager \
 	--config "$__type/files/alertmanager.yml" \
 	--storage-path /data/prometheus \
-	--listen-address "[::]:$PROMPORT"
+	--listen-address "[::]:$PROMPORT" \
+	--add-daemontools-service
 
 __consul_service alertmanager --port $ALERTPORT --check-http "http://localhost:$ALERTPORT/metrics" --check-interval 10s
 ```
