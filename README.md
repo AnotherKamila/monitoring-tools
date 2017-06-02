@@ -55,6 +55,8 @@ require="__daemontools __golang_from_vendor" __prometheus_alertmanager \
 	--config "$__type/files/alertmanager.yml" \
 	--storage-path /data/prometheus \
 	--listen-address "[::]:$ALERTPORT"
+
+__grafana_dashboard
 ```
 
 Node exporter:
