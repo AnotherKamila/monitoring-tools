@@ -63,7 +63,7 @@ __daemontools --from-package daemontools
 __golang_from_vendor --version 1.8.1  # required for prometheus and many exporters
 
 require="__golang_from_vendor" __go_get github.com/prometheus/node_exporter
-__daemontools_service node_exporter --run "/opt/gocode/bin/node_exporter"
+require="__daemontools" __daemontools_service node_exporter --run "/opt/gocode/bin/node_exporter"
 ```
 
 _Note: these types are currently available in cdist's `master` branch, but not yet in a release._
