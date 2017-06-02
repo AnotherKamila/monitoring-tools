@@ -21,9 +21,9 @@ I have created several cdist types useful for installing a Prometheus monitoring
 [Daemontools](https://cr.yp.to/daemontools.html) are awesome. In line with the Unix philosophy, they do one thing and do it well. In this case they make sure that services run. Without the messy parts!
 
 - [`__daemontools`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__daemontools/man.rst): Installs daemontools or your favorite derivative, plus an init script in case your package doesn't come with one.
-- [`__daemontools_service`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__daemontools_service/man.rst): Creates a service directory. I gladly use this for everything that doesn't come with a good init script, such as Prometheus and exporters. This type is awesome!
+- [`__daemontools_service`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__daemontools_service/man.rst): Creates a service directory. I gladly use this for everything that doesn't come with a good init script, such as Prometheus and exporters. It's so simple!
 
-### High-level types for installing Prometheus, Alertmanager, and the Grafana dashboard
+### High-level types for Prometheus and friends
 
 _Note: these are not merged in upstream yet. I will update with links when they are!_
 
@@ -79,6 +79,7 @@ bin/cdist config -vv <hostname>
 
 Read more at [cdist quickstart](http://www.nico.schottelius.org/software/cdist/man/latest/cdist-quickstart.html).
 
+**And don't forget: Questions, ideas, and pull requests are welcome!**
 
 ## Exporters for monitoring software that doesn't have built-in instrumentation
 
