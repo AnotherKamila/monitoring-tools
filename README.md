@@ -59,7 +59,7 @@ require="__daemontools __golang_from_vendor" __prometheus_alertmanager \
 
 Node exporter:
 ```sh
-__daemontools --from-package daemontools
+__daemontools
 __golang_from_vendor --version 1.8.1  # required for prometheus and many exporters
 
 require="__golang_from_vendor" __go_get github.com/prometheus/node_exporter
