@@ -79,7 +79,7 @@ bin/cdist config -vv <hostname>
 
 Read more at [cdist quickstart](http://www.nico.schottelius.org/software/cdist/man/latest/cdist-quickstart.html).
 
-**And don't forget: Questions, ideas, and pull requests are welcome!**
+And don't forget: **Questions, ideas, and pull requests are welcome!**
 
 ## Exporters for monitoring software that doesn't have built-in instrumentation
 
