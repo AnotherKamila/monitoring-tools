@@ -28,8 +28,8 @@ I have created several cdist types useful for installing a Prometheus monitoring
 _Note: these are not merged in upstream yet. I will update with links when they are!_
 
 - `__prometheus_server`: Installs and configures Prometheus server. Yay!
-- `__prometheus_alertmanager`: Install and configures Prometheus Alertmanager. Yay too!
-- `__grafana_dashboard`: Install and configures [Grafana](https://grafana.com/). Yay three!
+- `__prometheus_alertmanager`: Installs and configures Prometheus Alertmanager. Yay too!
+- `__grafana_dashboard`: Installs and configures [Grafana](https://grafana.com/). Yay three!
 
 ### Example
 
