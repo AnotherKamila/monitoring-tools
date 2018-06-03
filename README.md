@@ -11,25 +11,27 @@ I use it for configuring all my monitoring servers (among other things). [Below]
 
 I have created several cdist types useful for installing a Prometheus monitoring server, as well as many exporters:
 
-### Installing golang and go packages
+### High-level types for Prometheus and friends
 
-- [`__golang_from_vendor`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__golang_from_vendor/man.rst): Installs golang from https://golang.org. This makes it easy to install any version of golang, including those that your old and obsolete distro doesn't have.
-- [`__go_get`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__go_get/man.rst): Easy installation of golang packages straight from online repos. Useful for installing Prometheus itself or the various exporters.
+- [`__prometheus_server`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__prometheus_server/man.rst): Installs and configures Prometheus server. Yay!
+- [`__prometheus_alertmanager`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__prometheus_alertmanager/man.rst): Installs and configures Prometheus Alertmanager. Yay too!
+- [`__grafana_dashboard`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__grafana_dashboard/man.rst): Installs and configures [Grafana](https://grafana.com/). Yay three!
 
-### Daemontools
+### Extras (use as needed)
+
+#### Daemontools
 
 [Daemontools](https://cr.yp.to/daemontools.html) are awesome. In line with the Unix philosophy, they do one thing and do it well. In this case they make sure that services run. Without the messy parts!
 
 - [`__daemontools`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__daemontools/man.rst): Installs daemontools or your favorite derivative, plus an init script in case your package doesn't come with one.
-- [`__daemontools_service`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__daemontools_service/man.rst): Creates a service directory. I gladly use this for everything that doesn't come with a good init script, such as Prometheus and exporters. It's so simple!
+- [`__daemontools_service`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__daemontools_service/man.rst): Creates a service directory. I gladly use this for everything that doesn't come with a good init script, such as some exporters. It's so simple!
 
-### High-level types for Prometheus and friends
+#### Installing golang and go packages
 
-_Note: these are not merged in upstream yet. I will update with links when they are!_
+Most distros provide a reasonably new version of Prometheus and the basic exporters (worst case you'll have to use the `--install-from-backports` with my `__prometheus_server`). This is the recommended way. However, if you need something more, these types let you install a recent version of golang and go packages. Note that I am currently not using these in production. I am listing them here anyway for completeness.
 
-- `__prometheus_server`: Installs and configures Prometheus server. Yay!
-- `__prometheus_alertmanager`: Installs and configures Prometheus Alertmanager. Yay too!
-- `__grafana_dashboard`: Installs and configures [Grafana](https://grafana.com/). Yay three!
+- [`__golang_from_vendor`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__golang_from_vendor/man.rst): Installs golang from https://golang.org. This makes it easy to install any version of golang, including those that your old and obsolete distro doesn't have.
+- [`__go_get`](https://github.com/ungleich/cdist/blob/master/cdist/conf/type/__go_get/man.rst): Easy installation of golang packages straight from online repos. Useful for installing a newer version of Prometheus or various exporters.
 
 ### Example
 
@@ -37,38 +39,20 @@ Put this in you cdist manifest, edit to your needs, and rejoice!
 
 Monitoring server:
 ```sh
-PROMPORT=9090
-ALERTPORT=9093
-
-__daemontools
-__golang_from_vendor --version 1.8.1  # required for prometheus and many exporters
-
-require="__daemontools __golang_from_vendor" __prometheus_server \
-	--config "$__type/files/prometheus.yml" \
-	--retention-days 14 \
-	--storage-path /data/prometheus \
-	--listen-address "[::]:$PROMPORT" \
-	--rule-files "$__type/files/*.rules" \
-	--alertmanager-url "http://monitoring1.node.consul:$ALERTPORT,http://monitoring2.node.consul:$ALERTPORT"
-
-require="__daemontools __golang_from_vendor" __prometheus_alertmanager \
-	--config "$__type/files/alertmanager.yml" \
-	--storage-path /data/prometheus \
-	--listen-address "[::]:$ALERTPORT"
-
+__prometheus_server \
+    --install-from-backports \
+    --config "$__manifest/files/prometheus.yml" \
+    --retention-days 14 \
+    --storage-path /data/prometheus \
+    --rule-files "$__manifest/files/*.rules"
+    
+__prometheus_alertmanager \
+    --install-from-backports \
+    --config "$__manifest/files/alertmanager.yml" \
+    --storage-path /data/alertmanager
+    
 __grafana_dashboard
 ```
-
-Node exporter:
-```sh
-__daemontools
-__golang_from_vendor --version 1.8.1  # required for prometheus and many exporters
-
-require="__golang_from_vendor" __go_get github.com/prometheus/node_exporter
-require="__daemontools" __daemontools_service node_exporter --run "/opt/gocode/bin/node_exporter"
-```
-
-_Note: these types are currently available in cdist's `master` branch, but not yet in a release._
 
 ### A cdist lightning-quick-start
 
@@ -81,10 +65,11 @@ bin/cdist config -vv <hostname>
 
 Read more at [cdist quickstart](http://www.nico.schottelius.org/software/cdist/man/latest/cdist-quickstart.html).
 
-And don't forget: **Questions, ideas, and pull requests are welcome!**
+**Questions, ideas, and pull requests are welcome!**
 
 ## Exporters for monitoring software that doesn't have built-in instrumentation
 
+- [ttn2prom](https://github.com/AnotherKamila/ttn2prom): Trivial Python webserver that accepts webhooks (i.e. HTTP requests), processes the data in them, and exports the stuff in the Prometheus format. Very easy to adapt. This version exports data from some LoRaWan temperature sensors through webhooks from [The Things Network](https://www.thethingsnetwork.org/).
 - [opennebula exporter](https://github.com/AnotherKamila/opennebula-exporter): Exports useful metrics for [OpenNebula](https://opennebula.org/). For now it is an evil hack, but it will get better with time.
 - [OpenNebula integration test](https://github.com/AnotherKamila/opennebula-exporter/tree/master/integration_test): tests VM creation and connectivity, and exports the results in a Prometheus-compatible format.
 
